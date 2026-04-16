@@ -1,0 +1,1215 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>HENOK AI · v1.0 — The Launch</title>
+<style>
+  :root {
+    --gold: #ffd76a;
+    --gold-deep: #c68b20;
+    --purple: #7a5cff;
+    --cyan: #49e6ff;
+    --pink: #ff5cc8;
+    --bg0: #05020f;
+    --bg1: #0b0522;
+    --glass: rgba(255,255,255,0.06);
+    --glass-border: rgba(255,255,255,0.14);
+    --text: #f6f2ff;
+    --muted: #b9aee0;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { scroll-behavior: smooth; }
+  body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    background: radial-gradient(ellipse at 20% 10%, #1a0a3d 0%, var(--bg1) 35%, var(--bg0) 100%);
+    color: var(--text);
+    overflow-x: hidden;
+    min-height: 100vh;
+    position: relative;
+  }
+
+  /* ---------- Animated Background ---------- */
+  .cosmos {
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+    overflow: hidden;
+  }
+  .cosmos canvas { display: block; width: 100%; height: 100%; }
+  .aurora {
+    position: fixed;
+    inset: -20%;
+    z-index: 0;
+    pointer-events: none;
+    background:
+      radial-gradient(40vw 40vw at 15% 20%, rgba(122,92,255,0.35), transparent 60%),
+      radial-gradient(45vw 45vw at 85% 30%, rgba(73,230,255,0.22), transparent 65%),
+      radial-gradient(50vw 50vw at 50% 90%, rgba(255,92,200,0.22), transparent 60%);
+    filter: blur(40px);
+    animation: drift 22s ease-in-out infinite alternate;
+  }
+  @keyframes drift {
+    0%   { transform: translate3d(0,0,0) scale(1); }
+    50%  { transform: translate3d(-4%, 3%, 0) scale(1.05); }
+    100% { transform: translate3d(3%, -2%, 0) scale(0.98); }
+  }
+
+  .grid-floor {
+    position: fixed;
+    bottom: -30%;
+    left: -20%;
+    right: -20%;
+    height: 70vh;
+    z-index: 0;
+    pointer-events: none;
+    background:
+      linear-gradient(transparent 0%, rgba(122,92,255,0.15) 50%, transparent 100%),
+      linear-gradient(to right, transparent 1px, rgba(255,215,106,0.18) 1px) 0 0 / 80px 80px,
+      linear-gradient(to bottom, transparent 1px, rgba(73,230,255,0.15) 1px) 0 0 / 80px 80px;
+    transform: perspective(600px) rotateX(70deg);
+    mask-image: linear-gradient(to top, rgba(0,0,0,0.9), transparent 80%);
+    -webkit-mask-image: linear-gradient(to top, rgba(0,0,0,0.9), transparent 80%);
+    animation: grid-scroll 8s linear infinite;
+  }
+  @keyframes grid-scroll {
+    from { background-position: 0 0, 0 0, 0 0; }
+    to   { background-position: 0 0, 0 80px, 0 80px; }
+  }
+
+  /* ---------- Layout ---------- */
+  main {
+    position: relative;
+    z-index: 2;
+    padding: 0 6vw;
+  }
+
+  /* ---------- NAV ---------- */
+  nav {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    z-index: 100;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 18px 6vw;
+    backdrop-filter: blur(14px) saturate(130%);
+    -webkit-backdrop-filter: blur(14px) saturate(130%);
+    background: linear-gradient(to bottom, rgba(5,2,15,0.65), rgba(5,2,15,0.15));
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+  }
+  .brand {
+    display: flex; align-items: center; gap: 10px;
+    font-weight: 800; letter-spacing: 0.14em;
+    font-size: 14px;
+  }
+  .brand .dot {
+    width: 10px; height: 10px; border-radius: 50%;
+    background: radial-gradient(circle at 30% 30%, var(--gold), var(--gold-deep));
+    box-shadow: 0 0 16px var(--gold), 0 0 40px rgba(255,215,106,0.4);
+    animation: pulse 2.2s ease-in-out infinite;
+  }
+  @keyframes pulse {
+    0%,100% { transform: scale(1); opacity: 1; }
+    50%     { transform: scale(1.3); opacity: 0.75; }
+  }
+  nav ul { list-style: none; display: flex; gap: 28px; }
+  nav a {
+    color: var(--muted); text-decoration: none;
+    font-size: 13px; letter-spacing: 0.1em; text-transform: uppercase;
+    transition: color 0.3s;
+  }
+  nav a:hover { color: var(--gold); }
+  .cta-nav {
+    padding: 10px 18px;
+    border-radius: 999px;
+    background: linear-gradient(135deg, var(--gold), var(--gold-deep));
+    color: #1a0a00 !important;
+    font-weight: 700;
+    box-shadow: 0 8px 22px rgba(255,215,106,0.35);
+    transition: transform 0.2s;
+  }
+  .cta-nav:hover { transform: translateY(-2px); }
+
+  /* ---------- HERO ---------- */
+  header.hero {
+    min-height: 100vh;
+    display: flex; flex-direction: column; justify-content: center; align-items: center;
+    text-align: center;
+    padding: 140px 0 80px;
+    position: relative;
+  }
+
+  .badge {
+    display: inline-flex; align-items: center; gap: 10px;
+    padding: 8px 18px; border-radius: 999px;
+    background: var(--glass); border: 1px solid var(--glass-border);
+    font-size: 13px; letter-spacing: 0.2em; text-transform: uppercase;
+    color: var(--gold);
+    backdrop-filter: blur(8px);
+    margin-bottom: 30px;
+    animation: float-in 1s ease 0.1s both;
+  }
+  .badge::before {
+    content: ""; width: 8px; height: 8px; border-radius: 50%;
+    background: var(--gold);
+    box-shadow: 0 0 12px var(--gold);
+    animation: pulse 1.6s ease-in-out infinite;
+  }
+
+  h1.title {
+    font-size: clamp(3.5rem, 13vw, 11rem);
+    font-weight: 900;
+    line-height: 0.9;
+    letter-spacing: -0.04em;
+    background: linear-gradient(120deg, #fff 0%, var(--gold) 30%, var(--pink) 55%, var(--cyan) 80%, #fff 100%);
+    background-size: 300% 300%;
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    animation: shimmer 6s ease-in-out infinite, float-in 1.2s ease 0.2s both;
+    text-shadow: 0 0 80px rgba(255,215,106,0.1);
+    position: relative;
+  }
+  @keyframes shimmer {
+    0%, 100% { background-position: 0% 50%; }
+    50%      { background-position: 100% 50%; }
+  }
+  @keyframes float-in {
+    from { opacity: 0; transform: translateY(30px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  .title-row {
+    display: flex; align-items: center; justify-content: center;
+    gap: 25px; flex-wrap: wrap;
+  }
+  .version-chip {
+    font-family: 'JetBrains Mono', 'SF Mono', monospace;
+    font-size: clamp(1rem, 2vw, 1.8rem);
+    padding: 10px 22px;
+    border: 1.5px solid var(--gold);
+    border-radius: 10px;
+    color: var(--gold);
+    letter-spacing: 0.2em;
+    background: rgba(255,215,106,0.05);
+    box-shadow: inset 0 0 30px rgba(255,215,106,0.15), 0 0 40px rgba(255,215,106,0.2);
+    animation: float-in 1.2s ease 0.4s both, glow-pulse 3s ease-in-out infinite;
+  }
+  @keyframes glow-pulse {
+    0%,100% { box-shadow: inset 0 0 30px rgba(255,215,106,0.15), 0 0 40px rgba(255,215,106,0.2); }
+    50%     { box-shadow: inset 0 0 40px rgba(255,215,106,0.25), 0 0 70px rgba(255,215,106,0.4); }
+  }
+
+  .tagline {
+    margin-top: 36px;
+    font-size: clamp(1.1rem, 2vw, 1.6rem);
+    color: var(--muted);
+    max-width: 780px;
+    line-height: 1.5;
+    font-weight: 300;
+    animation: float-in 1.2s ease 0.5s both;
+  }
+  .tagline strong { color: var(--text); font-weight: 600; }
+
+  .hero-actions {
+    margin-top: 48px;
+    display: flex; gap: 18px; flex-wrap: wrap; justify-content: center;
+    animation: float-in 1.2s ease 0.7s both;
+  }
+  .btn {
+    padding: 16px 30px;
+    border-radius: 999px;
+    font-weight: 700; letter-spacing: 0.08em;
+    text-decoration: none;
+    cursor: pointer; border: none;
+    font-size: 14px; text-transform: uppercase;
+    transition: all 0.25s cubic-bezier(.2,.9,.3,1.4);
+  }
+  .btn-primary {
+    background: linear-gradient(135deg, var(--gold), var(--gold-deep));
+    color: #1a0a00;
+    box-shadow: 0 12px 30px rgba(255,215,106,0.35), 0 0 60px rgba(255,215,106,0.2);
+  }
+  .btn-primary:hover { transform: translateY(-4px) scale(1.04); box-shadow: 0 20px 45px rgba(255,215,106,0.5); }
+  .btn-ghost {
+    background: var(--glass);
+    border: 1.5px solid var(--glass-border);
+    color: var(--text);
+    backdrop-filter: blur(8px);
+  }
+  .btn-ghost:hover { border-color: var(--gold); color: var(--gold); }
+
+  .scroll-indicator {
+    position: absolute; bottom: 30px; left: 50%;
+    transform: translateX(-50%);
+    display: flex; flex-direction: column; align-items: center; gap: 10px;
+    color: var(--muted); font-size: 11px; letter-spacing: 0.3em;
+  }
+  .scroll-indicator .line {
+    width: 1px; height: 40px;
+    background: linear-gradient(to bottom, transparent, var(--gold), transparent);
+    animation: scroll-line 2s ease-in-out infinite;
+  }
+  @keyframes scroll-line {
+    0%,100% { transform: scaleY(1); opacity: 0.5; }
+    50%     { transform: scaleY(1.5); opacity: 1; }
+  }
+
+  /* ---------- SECTION COMMON ---------- */
+  section {
+    padding: 140px 0;
+    position: relative;
+  }
+  .section-label {
+    display: inline-block;
+    font-size: 12px; letter-spacing: 0.4em; text-transform: uppercase;
+    color: var(--gold); margin-bottom: 18px;
+  }
+  .section-label::before {
+    content: "— "; color: var(--gold);
+  }
+  h2 {
+    font-size: clamp(2.2rem, 5vw, 4.5rem);
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    line-height: 1.05;
+    margin-bottom: 24px;
+    background: linear-gradient(120deg, #fff, var(--muted) 60%, #fff);
+    -webkit-background-clip: text; background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+  .section-intro {
+    max-width: 680px; color: var(--muted);
+    font-size: 1.1rem; line-height: 1.7; margin-bottom: 60px;
+  }
+
+  /* ---------- STATS ---------- */
+  .stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 2px;
+    border-radius: 24px;
+    overflow: hidden;
+    background: var(--glass-border);
+    border: 1px solid var(--glass-border);
+    backdrop-filter: blur(20px);
+  }
+  .stat {
+    padding: 40px 30px;
+    background: rgba(11,5,34,0.7);
+    text-align: center;
+    position: relative;
+    transition: background 0.3s;
+  }
+  .stat:hover { background: rgba(122,92,255,0.15); }
+  .stat-num {
+    font-size: clamp(2.6rem, 5vw, 4rem);
+    font-weight: 900;
+    background: linear-gradient(135deg, var(--gold), var(--pink));
+    -webkit-background-clip: text; background-clip: text;
+    -webkit-text-fill-color: transparent;
+    line-height: 1;
+    font-variant-numeric: tabular-nums;
+  }
+  .stat-label {
+    margin-top: 10px;
+    font-size: 12px; letter-spacing: 0.2em; text-transform: uppercase;
+    color: var(--muted);
+  }
+
+  /* ---------- FEATURES ---------- */
+  .features {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 24px;
+  }
+  .feature {
+    position: relative;
+    padding: 36px 32px;
+    border-radius: 22px;
+    background: linear-gradient(145deg, rgba(255,255,255,0.06), rgba(255,255,255,0.02));
+    border: 1px solid var(--glass-border);
+    backdrop-filter: blur(14px);
+    overflow: hidden;
+    transition: transform 0.35s cubic-bezier(.2,.9,.3,1.4), border-color 0.3s;
+  }
+  .feature::before {
+    content: "";
+    position: absolute; inset: 0;
+    background: radial-gradient(600px circle at var(--mx,50%) var(--my,50%), rgba(255,215,106,0.12), transparent 40%);
+    opacity: 0; transition: opacity 0.3s;
+    pointer-events: none;
+  }
+  .feature:hover { transform: translateY(-8px); border-color: rgba(255,215,106,0.35); }
+  .feature:hover::before { opacity: 1; }
+  .feature-icon {
+    width: 52px; height: 52px; border-radius: 14px;
+    display: grid; place-items: center;
+    background: linear-gradient(135deg, rgba(122,92,255,0.35), rgba(73,230,255,0.25));
+    border: 1px solid var(--glass-border);
+    margin-bottom: 20px;
+    font-size: 22px;
+  }
+  .feature h3 {
+    font-size: 1.3rem; margin-bottom: 12px; font-weight: 700;
+  }
+  .feature p {
+    color: var(--muted); font-size: 0.95rem; line-height: 1.65;
+  }
+
+  /* ---------- TIMELINE ---------- */
+  .timeline {
+    position: relative;
+    padding-left: 40px;
+  }
+  .timeline::before {
+    content: ""; position: absolute;
+    left: 10px; top: 10px; bottom: 10px;
+    width: 2px;
+    background: linear-gradient(to bottom, var(--gold), var(--purple), var(--cyan));
+    box-shadow: 0 0 16px rgba(255,215,106,0.4);
+  }
+  .milestone {
+    position: relative;
+    padding: 20px 0 40px 30px;
+  }
+  .milestone::before {
+    content: "";
+    position: absolute;
+    left: -36px; top: 28px;
+    width: 16px; height: 16px;
+    border-radius: 50%;
+    background: radial-gradient(circle at 30% 30%, var(--gold), var(--gold-deep));
+    box-shadow: 0 0 0 5px rgba(255,215,106,0.15), 0 0 20px var(--gold);
+  }
+  .milestone time {
+    display: inline-block;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px; letter-spacing: 0.2em;
+    color: var(--gold); text-transform: uppercase;
+    padding: 4px 12px;
+    border: 1px solid rgba(255,215,106,0.3);
+    border-radius: 999px;
+    margin-bottom: 10px;
+  }
+  .milestone h4 { font-size: 1.35rem; margin-bottom: 8px; }
+  .milestone p { color: var(--muted); line-height: 1.65; max-width: 620px; }
+
+  /* ---------- SHOWCASE ---------- */
+  .showcase {
+    border-radius: 28px;
+    padding: 60px 48px;
+    background: linear-gradient(135deg, rgba(122,92,255,0.2), rgba(255,92,200,0.12) 50%, rgba(73,230,255,0.15));
+    border: 1px solid var(--glass-border);
+    backdrop-filter: blur(20px);
+    position: relative; overflow: hidden;
+  }
+  .showcase::before {
+    content: "";
+    position: absolute; inset: 0;
+    background:
+      radial-gradient(400px circle at 10% 20%, rgba(255,215,106,0.25), transparent 40%),
+      radial-gradient(500px circle at 90% 80%, rgba(255,92,200,0.25), transparent 50%);
+    pointer-events: none;
+  }
+  .showcase > * { position: relative; z-index: 1; }
+  .showcase-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 18px;
+    margin-top: 36px;
+  }
+  .chip {
+    padding: 18px 22px;
+    background: rgba(5,2,15,0.55);
+    border: 1px solid var(--glass-border);
+    border-radius: 16px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px;
+    display: flex; align-items: center; gap: 12px;
+  }
+  .chip-ok {
+    width: 22px; height: 22px; border-radius: 50%;
+    background: linear-gradient(135deg, #34ffb0, #0ca464);
+    display: grid; place-items: center;
+    color: #002a14; font-weight: 900; font-size: 12px;
+    box-shadow: 0 0 14px rgba(52,255,176,0.5);
+  }
+
+  /* ---------- QUOTE ---------- */
+  .quote-wrap {
+    text-align: center;
+    max-width: 900px; margin: 0 auto;
+    padding: 60px 0;
+  }
+  .big-quote {
+    font-size: clamp(1.5rem, 3vw, 2.6rem);
+    line-height: 1.3; font-weight: 300;
+    background: linear-gradient(120deg, #fff, var(--gold), var(--pink), #fff);
+    background-size: 200% 200%;
+    -webkit-background-clip: text; background-clip: text;
+    -webkit-text-fill-color: transparent;
+    animation: shimmer 8s ease-in-out infinite;
+  }
+  .big-quote::before, .big-quote::after {
+    content: "“"; color: var(--gold); font-family: Georgia, serif;
+    font-size: 1.6em; line-height: 0;
+    vertical-align: -0.35em; margin-right: 0.1em;
+  }
+  .big-quote::after { content: "”"; margin-left: 0.1em; margin-right: 0; }
+  .byline {
+    margin-top: 28px; font-size: 13px; letter-spacing: 0.3em; text-transform: uppercase;
+    color: var(--muted);
+  }
+
+  /* ---------- ACHIEVEMENTS ---------- */
+  .achievements {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+    gap: 20px;
+  }
+  .badge-card {
+    position: relative;
+    padding: 28px 20px;
+    border-radius: 20px;
+    background: radial-gradient(circle at 50% 0%, rgba(255,215,106,0.15), transparent 70%), rgba(11,5,34,0.7);
+    border: 1px solid var(--glass-border);
+    text-align: center;
+    overflow: hidden;
+    transition: transform 0.3s;
+  }
+  .badge-card:hover { transform: translateY(-6px) rotate(-1deg); }
+  .medal {
+    width: 72px; height: 72px; margin: 0 auto 14px;
+    border-radius: 50%;
+    background: conic-gradient(from 0deg, var(--gold), #fff4c2, var(--gold-deep), var(--gold));
+    display: grid; place-items: center;
+    font-size: 30px;
+    box-shadow: 0 0 30px rgba(255,215,106,0.4), inset 0 0 15px rgba(255,255,255,0.2);
+    position: relative;
+  }
+  .medal::after {
+    content: ""; position: absolute; inset: 4px;
+    border-radius: 50%;
+    background: radial-gradient(circle at 35% 30%, #fff2b0, var(--gold-deep));
+  }
+  .medal span {
+    position: relative; z-index: 1;
+    filter: drop-shadow(0 2px 2px rgba(0,0,0,0.3));
+  }
+  .badge-card h5 { font-size: 1rem; margin-bottom: 6px; font-weight: 700; }
+  .badge-card p { font-size: 0.8rem; color: var(--muted); line-height: 1.5; }
+
+  /* ---------- FINALE ---------- */
+  .finale {
+    text-align: center;
+    padding: 160px 0;
+    position: relative;
+  }
+  .finale h2 {
+    font-size: clamp(2.5rem, 8vw, 7rem);
+    background: linear-gradient(120deg, #fff, var(--gold) 40%, var(--pink) 70%, var(--cyan));
+    background-size: 200% 200%;
+    -webkit-background-clip: text; background-clip: text;
+    -webkit-text-fill-color: transparent;
+    animation: shimmer 5s ease-in-out infinite;
+  }
+  .finale p { color: var(--muted); font-size: 1.2rem; max-width: 620px; margin: 0 auto 40px; }
+  .confetti-btn {
+    padding: 22px 46px; font-size: 16px;
+    background: linear-gradient(135deg, var(--gold), var(--pink) 50%, var(--purple));
+    background-size: 200% 200%;
+    color: #fff; font-weight: 800; letter-spacing: 0.1em;
+    border-radius: 999px; border: none; cursor: pointer;
+    box-shadow: 0 18px 50px rgba(122,92,255,0.5), 0 0 80px rgba(255,92,200,0.3);
+    text-transform: uppercase;
+    transition: transform 0.3s, background-position 0.4s;
+  }
+  .confetti-btn:hover {
+    transform: translateY(-4px) scale(1.05);
+    background-position: 100% 100%;
+  }
+
+  /* ---------- FOOTER ---------- */
+  footer {
+    padding: 60px 6vw 40px;
+    border-top: 1px solid var(--glass-border);
+    text-align: center;
+    color: var(--muted);
+    font-size: 13px;
+    position: relative; z-index: 2;
+    backdrop-filter: blur(8px);
+  }
+  footer .foot-brand {
+    font-weight: 800; color: var(--gold); letter-spacing: 0.2em;
+  }
+  footer .foot-divider {
+    width: 60px; height: 1px; margin: 20px auto;
+    background: linear-gradient(to right, transparent, var(--gold), transparent);
+  }
+
+  /* ---------- REVEAL ---------- */
+  .reveal { opacity: 0; transform: translateY(40px); transition: opacity 0.9s ease, transform 0.9s cubic-bezier(.2,.8,.2,1); }
+  .reveal.in { opacity: 1; transform: translateY(0); }
+
+  /* ---------- CONFETTI ---------- */
+  #confetti-canvas {
+    position: fixed; inset: 0; z-index: 99; pointer-events: none;
+  }
+
+  /* ---------- MUSIC TOGGLE ---------- */
+  #music-toggle {
+    position: fixed;
+    bottom: 26px; right: 26px;
+    z-index: 200;
+    display: flex; align-items: center; gap: 10px;
+    padding: 14px 20px 14px 16px;
+    border-radius: 999px;
+    background: linear-gradient(135deg, #ff5cc8, #ffd76a);
+    color: #2a0015;
+    font-weight: 800; letter-spacing: 0.1em;
+    font-size: 12px; text-transform: uppercase;
+    border: none; cursor: pointer;
+    box-shadow: 0 14px 32px rgba(255,92,200,0.45), 0 0 60px rgba(255,215,106,0.3);
+    transition: transform 0.25s cubic-bezier(.2,.9,.3,1.4);
+    animation: wiggle 3s ease-in-out infinite;
+  }
+  #music-toggle:hover { transform: translateY(-3px) scale(1.05); }
+  #music-toggle.playing {
+    background: linear-gradient(135deg, #49e6ff, #7a5cff);
+    color: #fff;
+  }
+  #music-toggle .ico {
+    width: 28px; height: 28px; border-radius: 50%;
+    background: rgba(255,255,255,0.6);
+    display: grid; place-items: center;
+    font-size: 16px;
+  }
+  #music-toggle.playing .ico {
+    animation: spin 2s linear infinite;
+    background: rgba(255,255,255,0.25);
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  @keyframes wiggle {
+    0%,100% { transform: rotate(-2deg); }
+    50%     { transform: rotate(2deg); }
+  }
+  #music-toggle.playing { animation: none; }
+  .bars {
+    display: inline-flex; gap: 2px; align-items: flex-end; height: 14px;
+  }
+  .bars span {
+    width: 3px; background: currentColor; border-radius: 2px;
+    height: 6px;
+    animation: eq 0.7s ease-in-out infinite;
+  }
+  .bars span:nth-child(2) { animation-delay: 0.15s; height: 10px; }
+  .bars span:nth-child(3) { animation-delay: 0.3s; height: 4px; }
+  .bars span:nth-child(4) { animation-delay: 0.45s; height: 12px; }
+  @keyframes eq {
+    0%,100% { transform: scaleY(0.5); }
+    50%     { transform: scaleY(1.3); }
+  }
+
+  @media (max-width: 720px) {
+    nav ul { display: none; }
+    section { padding: 100px 0; }
+    .showcase { padding: 40px 24px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- Animated background -->
+<div class="aurora"></div>
+<div class="cosmos"><canvas id="stars"></canvas></div>
+<div class="grid-floor"></div>
+
+<!-- Nav -->
+<nav>
+  <div class="brand"><span class="dot"></span> HENOK·AI</div>
+  <ul>
+    <li><a href="#story">Story</a></li>
+    <li><a href="#features">Features</a></li>
+    <li><a href="#journey">Journey</a></li>
+    <li><a href="#achievements">Honors</a></li>
+    <li><a href="#launch" class="cta-nav">Launch v1.0</a></li>
+  </ul>
+</nav>
+
+<main>
+
+<!-- HERO -->
+<header class="hero">
+  <span class="badge">✦ Official Launch · April 2026 ✦</span>
+  <div class="title-row">
+    <h1 class="title">HENOK&nbsp;AI</h1>
+  </div>
+  <div class="version-chip" style="margin-top: 28px;">▶ VERSION&nbsp;1.0&nbsp;·&nbsp;GOLD&nbsp;MASTER</div>
+  <p class="tagline">
+    After countless sleepless nights, thousands of commits, and one relentless vision —
+    <strong>Henok AI v1</strong> has arrived. Intelligence, crafted with intention.
+    This is only the beginning.
+  </p>
+  <div class="hero-actions">
+    <a href="#launch" class="btn btn-primary">🎉 Celebrate the Launch</a>
+    <a href="#story" class="btn btn-ghost">Read the Story</a>
+  </div>
+  <div class="scroll-indicator">
+    <span>SCROLL</span>
+    <div class="line"></div>
+  </div>
+</header>
+
+<!-- STATS -->
+<section id="story" class="reveal">
+  <span class="section-label">By the Numbers</span>
+  <h2>A milestone, quantified.</h2>
+  <p class="section-intro">
+    Every line of code, every hour of training, every conversation that shaped the model —
+    these numbers tell a story of focus, persistence, and the weird magic that happens when
+    a vision finally becomes real.
+  </p>
+
+  <div class="stats">
+    <div class="stat"><div class="stat-num" data-target="3">0</div><div class="stat-label">Days of Work</div></div>
+    <div class="stat"><div class="stat-num" data-target="12847">0</div><div class="stat-label">Commits Shipped</div></div>
+    <div class="stat"><div class="stat-num" data-target="99.7" data-decimals="1">0</div><div class="stat-label">% Uptime Target</div></div>
+    <div class="stat"><div class="stat-num" data-target="1">0</div><div class="stat-label">Version One</div></div>
+  </div>
+</section>
+
+<!-- FEATURES -->
+<section id="features" class="reveal">
+  <span class="section-label">What We Built</span>
+  <h2>Capabilities that ship today.</h2>
+  <p class="section-intro">
+    Henok AI v1.0 isn't a demo. It's a production-grade platform built to think clearly,
+    respond quickly, and stay out of your way.
+  </p>
+
+  <div class="features">
+    <div class="feature" data-tilt>
+      <div class="feature-icon">⚡</div>
+      <h3>Lightning Reasoning</h3>
+      <p>A fine-tuned inference pipeline engineered for sub-second responses under real workloads, with graceful degradation at peak traffic.</p>
+    </div>
+    <div class="feature" data-tilt>
+      <div class="feature-icon">🧠</div>
+      <h3>Context That Sticks</h3>
+      <p>Long-form memory and retrieval layers that stay coherent across sessions — no more "wait, what were we talking about?"</p>
+    </div>
+    <div class="feature" data-tilt>
+      <div class="feature-icon">🛡️</div>
+      <h3>Safety by Design</h3>
+      <p>Policy guardrails, content filters, and red-team hardening baked in from the first commit, not bolted on at the end.</p>
+    </div>
+    <div class="feature" data-tilt>
+      <div class="feature-icon">🎨</div>
+      <h3>Multimodal Canvas</h3>
+      <p>Text, image, and structured data flow through a unified representation, so the output matches how you actually think.</p>
+    </div>
+    <div class="feature" data-tilt>
+      <div class="feature-icon">🔌</div>
+      <h3>Real Integrations</h3>
+      <p>First-class SDKs, REST + streaming APIs, and drop-in connectors for the tools you already use every day.</p>
+    </div>
+    <div class="feature" data-tilt>
+      <div class="feature-icon">🌍</div>
+      <h3>Built for Everyone</h3>
+      <p>Localized for multiple languages on day one, with accessibility and inclusive defaults at the core of the experience.</p>
+    </div>
+  </div>
+</section>
+
+<!-- JOURNEY -->
+<section id="journey" class="reveal">
+  <span class="section-label">The Journey</span>
+  <h2>From blank canvas to v1.0.</h2>
+  <p class="section-intro">
+    The long road to launch, compressed into moments that mattered.
+  </p>
+
+  <div class="timeline">
+    <div class="milestone">
+      <time>2025 · SPARK</time>
+      <h4>The First Commit</h4>
+      <p>A single repo, a single README, and a single wildly ambitious idea: build an AI that feels genuinely useful, not just impressive.</p>
+    </div>
+    <div class="milestone">
+      <time>2025 · FOUNDATION</time>
+      <h4>Core Architecture</h4>
+      <p>Training pipelines, eval harnesses, and the first version of the reasoning stack came online. Everything broke. Everything got fixed.</p>
+    </div>
+    <div class="milestone">
+      <time>2026 · Q1 · ALPHA</time>
+      <h4>Internal Alpha</h4>
+      <p>The first conversations with Henok actually made sense. A small circle of brave testers pushed it to its limits and documented every edge case.</p>
+    </div>
+    <div class="milestone">
+      <time>2026 · Q1 · BETA</time>
+      <h4>Closed Beta</h4>
+      <p>Onboarded early partners. Refined the tone, trimmed the rough edges, and watched real users solve real problems with it.</p>
+    </div>
+    <div class="milestone">
+      <time>2026 · APRIL · LAUNCH</time>
+      <h4>🚀 Version 1.0 — You Are Here</h4>
+      <p>The gold master. Tested, signed, sealed, delivered. Henok AI steps out of stealth and into the world.</p>
+    </div>
+  </div>
+</section>
+
+<!-- SHOWCASE -->
+<section class="reveal">
+  <span class="section-label">Launch Checklist</span>
+  <h2>Everything is green.</h2>
+  <div class="showcase">
+    <p style="color: var(--muted); max-width: 620px; font-size: 1.05rem; line-height: 1.6;">
+      Before shipping, we wrote a list of every box we needed to tick.
+      Today, every single one of them is green. Here's what that looks like:
+    </p>
+    <div class="showcase-grid">
+      <div class="chip"><span class="chip-ok">✓</span> Core model trained</div>
+      <div class="chip"><span class="chip-ok">✓</span> Eval suite passing</div>
+      <div class="chip"><span class="chip-ok">✓</span> Safety review signed</div>
+      <div class="chip"><span class="chip-ok">✓</span> Load tests green</div>
+      <div class="chip"><span class="chip-ok">✓</span> SDKs published</div>
+      <div class="chip"><span class="chip-ok">✓</span> Docs finalized</div>
+      <div class="chip"><span class="chip-ok">✓</span> Monitoring live</div>
+      <div class="chip"><span class="chip-ok">✓</span> Rollback tested</div>
+      <div class="chip"><span class="chip-ok">✓</span> Support on call</div>
+      <div class="chip"><span class="chip-ok">✓</span> Launch tweet drafted</div>
+      <div class="chip"><span class="chip-ok">✓</span> Cake ordered</div>
+      <div class="chip"><span class="chip-ok">✓</span> Champagne chilled</div>
+    </div>
+  </div>
+</section>
+
+<!-- QUOTE -->
+<section class="reveal">
+  <div class="quote-wrap">
+    <p class="big-quote">
+      We didn't ship a product. We shipped a promise —
+      that intelligence, done thoughtfully, can make the hard things feel simple.
+    </p>
+    <div class="byline">— The Team Behind Henok AI</div>
+  </div>
+</section>
+
+<!-- ACHIEVEMENTS -->
+<section id="achievements" class="reveal">
+  <span class="section-label">Honors Unlocked</span>
+  <h2>Trophies from the road.</h2>
+  <p class="section-intro">
+    Every milestone deserves a medal. Here are the ones we earned getting here.
+  </p>
+  <div class="achievements">
+    <div class="badge-card"><div class="medal"><span>🏆</span></div><h5>Gold Master</h5><p>Shipped the v1.0 release candidate</p></div>
+    <div class="badge-card"><div class="medal"><span>⚔️</span></div><h5>Red Team Survivor</h5><p>Passed 1,000+ adversarial prompts</p></div>
+    <div class="badge-card"><div class="medal"><span>🚀</span></div><h5>Zero to One</h5><p>Built something that didn't exist before</p></div>
+    <div class="badge-card"><div class="medal"><span>🔥</span></div><h5>Bug Slayer</h5><p>Closed 2,400+ issues before launch</p></div>
+    <div class="badge-card"><div class="medal"><span>🧘</span></div><h5>Latency Monk</h5><p>Shaved 320ms off the critical path</p></div>
+    <div class="badge-card"><div class="medal"><span>🌟</span></div><h5>Day One User</h5><p>Built for the people on the other side of the screen</p></div>
+  </div>
+</section>
+
+<!-- FINALE -->
+<section id="launch" class="finale reveal">
+  <span class="section-label">Today We Celebrate</span>
+  <h2>Welcome to v1.0.</h2>
+  <p>Hit the button. You earned it.</p>
+  <button class="confetti-btn" id="celebrate">🎊 Unleash the Confetti 🎊</button>
+</section>
+
+</main>
+
+<footer>
+  <div class="foot-brand">HENOK · AI · v1.0</div>
+  <div class="foot-divider"></div>
+  <div>Shipped with care on April 16, 2026 · Crafted for the curious</div>
+  <div style="margin-top: 8px; opacity: 0.6;">Here's to v2 ✨</div>
+</footer>
+
+<canvas id="confetti-canvas"></canvas>
+
+<button id="music-toggle" aria-label="Toggle rock music">
+  <span class="ico">🎸</span>
+  <span class="label">Enter the Jungle</span>
+</button>
+
+<script>
+/* ---------------- Starfield ---------------- */
+(function(){
+  const canvas = document.getElementById('stars');
+  const ctx = canvas.getContext('2d');
+  let w, h, stars;
+  function resize() {
+    w = canvas.width = window.innerWidth;
+    h = canvas.height = window.innerHeight;
+    const count = Math.min(220, Math.floor(w * h / 9000));
+    stars = Array.from({length: count}, () => ({
+      x: Math.random()*w, y: Math.random()*h,
+      r: Math.random()*1.4 + 0.2,
+      tw: Math.random()*Math.PI*2,
+      sp: 0.005 + Math.random()*0.015,
+      drift: 0.02 + Math.random()*0.05,
+      hue: Math.random() < 0.15 ? 45 : (Math.random() < 0.3 ? 280 : 200)
+    }));
+  }
+  resize();
+  window.addEventListener('resize', resize);
+
+  function frame() {
+    ctx.clearRect(0,0,w,h);
+    for (const s of stars) {
+      s.tw += s.sp;
+      const a = 0.35 + Math.abs(Math.sin(s.tw))*0.65;
+      ctx.beginPath();
+      ctx.arc(s.x, s.y, s.r, 0, Math.PI*2);
+      ctx.fillStyle = `hsla(${s.hue}, 90%, 80%, ${a})`;
+      ctx.shadowBlur = 10;
+      ctx.shadowColor = `hsla(${s.hue}, 90%, 70%, ${a*0.8})`;
+      ctx.fill();
+      s.y += s.drift;
+      if (s.y > h) { s.y = 0; s.x = Math.random()*w; }
+    }
+    requestAnimationFrame(frame);
+  }
+  frame();
+})();
+
+/* ---------------- Scroll Reveal ---------------- */
+const io = new IntersectionObserver((entries) => {
+  entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('in'); });
+}, { threshold: 0.12 });
+document.querySelectorAll('.reveal').forEach(el => io.observe(el));
+
+/* ---------------- Counting Stats ---------------- */
+const counters = document.querySelectorAll('.stat-num');
+const counterIO = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if (!entry.isIntersecting) return;
+    const el = entry.target;
+    const target = parseFloat(el.dataset.target);
+    const decimals = parseInt(el.dataset.decimals || '0');
+    const dur = 1800;
+    const start = performance.now();
+    function step(now) {
+      const p = Math.min(1, (now - start) / dur);
+      const ease = 1 - Math.pow(1 - p, 3);
+      const v = target * ease;
+      el.textContent = decimals ? v.toFixed(decimals) : Math.round(v).toLocaleString();
+      if (p < 1) requestAnimationFrame(step);
+    }
+    requestAnimationFrame(step);
+    counterIO.unobserve(el);
+  });
+}, { threshold: 0.5 });
+counters.forEach(c => counterIO.observe(c));
+
+/* ---------------- Feature Tilt / Spotlight ---------------- */
+document.querySelectorAll('[data-tilt]').forEach(card => {
+  card.addEventListener('mousemove', (e) => {
+    const r = card.getBoundingClientRect();
+    const x = e.clientX - r.left;
+    const y = e.clientY - r.top;
+    card.style.setProperty('--mx', x + 'px');
+    card.style.setProperty('--my', y + 'px');
+    const rx = ((y / r.height) - 0.5) * -6;
+    const ry = ((x / r.width) - 0.5) * 6;
+    card.style.transform = `perspective(900px) rotateX(${rx}deg) rotateY(${ry}deg) translateY(-6px)`;
+  });
+  card.addEventListener('mouseleave', () => {
+    card.style.transform = '';
+  });
+});
+
+/* ---------------- Confetti ---------------- */
+(function(){
+  const canvas = document.getElementById('confetti-canvas');
+  const ctx = canvas.getContext('2d');
+  let w, h;
+  function resize() { w = canvas.width = window.innerWidth; h = canvas.height = window.innerHeight; }
+  resize(); window.addEventListener('resize', resize);
+
+  const colors = ['#ffd76a','#7a5cff','#49e6ff','#ff5cc8','#ffffff','#ffb347','#34ffb0'];
+  let pieces = [];
+  let running = false;
+
+  function burst(x, y, n=160) {
+    for (let i = 0; i < n; i++) {
+      pieces.push({
+        x, y,
+        vx: (Math.random() - 0.5) * 14,
+        vy: (Math.random() * -14) - 4,
+        g: 0.25 + Math.random()*0.2,
+        size: 6 + Math.random()*8,
+        rot: Math.random()*Math.PI*2,
+        vr: (Math.random()-0.5)*0.3,
+        color: colors[(Math.random()*colors.length)|0],
+        life: 0,
+        max: 180 + Math.random()*120,
+        shape: Math.random() < 0.5 ? 'rect' : 'circle'
+      });
+    }
+    if (!running) { running = true; loop(); }
+  }
+
+  function loop() {
+    ctx.clearRect(0,0,w,h);
+    pieces.forEach(p => {
+      p.vy += p.g;
+      p.vx *= 0.995;
+      p.x += p.vx;
+      p.y += p.vy;
+      p.rot += p.vr;
+      p.life++;
+      const alpha = Math.max(0, 1 - p.life/p.max);
+      ctx.save();
+      ctx.globalAlpha = alpha;
+      ctx.translate(p.x, p.y);
+      ctx.rotate(p.rot);
+      ctx.fillStyle = p.color;
+      ctx.shadowBlur = 8;
+      ctx.shadowColor = p.color;
+      if (p.shape === 'rect') ctx.fillRect(-p.size/2, -p.size/3, p.size, p.size/2);
+      else { ctx.beginPath(); ctx.arc(0,0,p.size/2,0,Math.PI*2); ctx.fill(); }
+      ctx.restore();
+    });
+    pieces = pieces.filter(p => p.life < p.max && p.y < h + 40);
+    if (pieces.length) requestAnimationFrame(loop);
+    else { running = false; ctx.clearRect(0,0,w,h); }
+  }
+
+  const btn = document.getElementById('celebrate');
+  btn.addEventListener('click', () => {
+    const r = btn.getBoundingClientRect();
+    const cx = r.left + r.width/2;
+    const cy = r.top + r.height/2;
+    burst(cx, cy, 220);
+    setTimeout(() => burst(w*0.2, h*0.4, 120), 250);
+    setTimeout(() => burst(w*0.8, h*0.4, 120), 450);
+    setTimeout(() => burst(cx, cy, 160), 700);
+  });
+
+  /* A little welcome burst */
+  window.addEventListener('load', () => {
+    setTimeout(() => burst(w/2, h*0.2, 140), 600);
+  });
+})();
+
+/* ---------------- ARENA ROCK ANTHEM 🎸 ---------------- */
+/* Original rock instrumental — distorted lead over palm-muted chugs,
+   driving bass, and a classic rock kit. All synthesized live. */
+(function(){
+  let audioCtx = null;
+  let musicOn = false;
+  let schedulerId = null;
+  let step = 0;
+  let nextNoteTime = 0;
+  const bpm = 124;
+  const stepDur = 60 / bpm / 2;  // eighth notes
+
+  const f = (m) => 440 * Math.pow(2, (m - 69) / 12);
+
+  // 32-step lead (E minor pentatonic — classic rock soloing vocabulary)
+  const lead = [
+    64, 67, 69, 71, 69, 67, 64, 62,
+    64, 67, 71, 74, 71, 69, 67, 64,
+    71, 74, 71, 69, 67, 69, 67, 64,
+    67, 69, 71, 74, 76, 74, 71, 69,
+  ];
+
+  // Rhythm chug — follows a i-III-VII-iv-ish power-chord progression: Em G D A
+  const rhythm = [
+    52, 52, 52, 52, 52, 52, 52, 52,  // E3 (Em)
+    55, 55, 55, 55, 55, 55, 55, 55,  // G3  (G)
+    50, 50, 50, 50, 50, 50, 50, 50,  // D3  (D)
+    57, 57, 57, 57, 57, 57, 57, 57,  // A3  (A)
+  ];
+
+  // Bass — one octave below the rhythm
+  const bass = [
+    40, 40, 40, 40, 40, 40, 40, 40,
+    43, 43, 43, 43, 43, 43, 43, 43,
+    38, 38, 38, 38, 38, 38, 38, 38,
+    45, 45, 45, 45, 45, 45, 45, 45,
+  ];
+
+  let master;
+
+  function distCurve(amount) {
+    const n = 2048;
+    const curve = new Float32Array(n);
+    const k = amount;
+    for (let i = 0; i < n; i++) {
+      const x = (i * 2 / n) - 1;
+      curve[i] = (3 + k) * x * 20 * (Math.PI / 180) / (Math.PI + k * Math.abs(x));
+    }
+    return curve;
+  }
+
+  function distortedGuitar(time, freq, dur, vol=0.09) {
+    // Detuned dual-saw through waveshaper = gritty distorted electric
+    const osc1 = audioCtx.createOscillator();
+    const osc2 = audioCtx.createOscillator();
+    osc1.type = 'sawtooth'; osc2.type = 'sawtooth';
+    osc1.frequency.value = freq * Math.pow(2, -9/1200);
+    osc2.frequency.value = freq * Math.pow(2,  9/1200);
+    const mix = audioCtx.createGain();
+    const shaper = audioCtx.createWaveShaper();
+    shaper.curve = distCurve(380);
+    shaper.oversample = '2x';
+    const lp = audioCtx.createBiquadFilter();
+    lp.type = 'lowpass'; lp.frequency.value = 3400;
+    const g = audioCtx.createGain();
+    osc1.connect(mix); osc2.connect(mix);
+    mix.connect(shaper); shaper.connect(lp); lp.connect(g); g.connect(master);
+    g.gain.setValueAtTime(0, time);
+    g.gain.linearRampToValueAtTime(vol, time + 0.006);
+    g.gain.exponentialRampToValueAtTime(0.001, time + dur);
+    osc1.start(time); osc1.stop(time + dur + 0.05);
+    osc2.start(time); osc2.stop(time + dur + 0.05);
+  }
+
+  function mutedChug(time, freq, dur, vol=0.13) {
+    // Sharp percussive palm-mute chug
+    const osc = audioCtx.createOscillator();
+    osc.type = 'sawtooth';
+    osc.frequency.value = freq;
+    const shaper = audioCtx.createWaveShaper();
+    shaper.curve = distCurve(180);
+    const lp = audioCtx.createBiquadFilter();
+    lp.type = 'lowpass'; lp.frequency.value = 1300;
+    const g = audioCtx.createGain();
+    osc.connect(shaper); shaper.connect(lp); lp.connect(g); g.connect(master);
+    g.gain.setValueAtTime(0, time);
+    g.gain.linearRampToValueAtTime(vol, time + 0.002);
+    g.gain.exponentialRampToValueAtTime(0.001, time + dur * 0.45);
+    osc.start(time); osc.stop(time + dur * 0.55);
+  }
+
+  function bassNote(time, freq, dur, vol=0.2) {
+    const osc = audioCtx.createOscillator();
+    osc.type = 'sawtooth';
+    osc.frequency.value = freq;
+    const lp = audioCtx.createBiquadFilter();
+    lp.type = 'lowpass'; lp.frequency.value = 650;
+    const g = audioCtx.createGain();
+    osc.connect(lp); lp.connect(g); g.connect(master);
+    g.gain.setValueAtTime(0, time);
+    g.gain.linearRampToValueAtTime(vol, time + 0.005);
+    g.gain.exponentialRampToValueAtTime(0.001, time + dur);
+    osc.start(time); osc.stop(time + dur + 0.05);
+  }
+
+  function kick(time) {
+    const osc = audioCtx.createOscillator();
+    const g = audioCtx.createGain();
+    osc.type = 'sine';
+    osc.frequency.setValueAtTime(140, time);
+    osc.frequency.exponentialRampToValueAtTime(42, time + 0.08);
+    g.gain.setValueAtTime(0.5, time);
+    g.gain.exponentialRampToValueAtTime(0.001, time + 0.18);
+    osc.connect(g); g.connect(master);
+    osc.start(time); osc.stop(time + 0.22);
+  }
+
+  function snare(time) {
+    const bufSize = audioCtx.sampleRate * 0.2;
+    const buf = audioCtx.createBuffer(1, bufSize, audioCtx.sampleRate);
+    const d = buf.getChannelData(0);
+    for (let i = 0; i < bufSize; i++) d[i] = Math.random()*2 - 1;
+    const noise = audioCtx.createBufferSource();
+    noise.buffer = buf;
+    const bp = audioCtx.createBiquadFilter();
+    bp.type = 'bandpass'; bp.frequency.value = 1800; bp.Q.value = 0.9;
+    const g = audioCtx.createGain();
+    g.gain.setValueAtTime(0.3, time);
+    g.gain.exponentialRampToValueAtTime(0.001, time + 0.14);
+    const tone = audioCtx.createOscillator();
+    tone.type = 'triangle'; tone.frequency.value = 220;
+    const tg = audioCtx.createGain();
+    tg.gain.setValueAtTime(0.14, time);
+    tg.gain.exponentialRampToValueAtTime(0.001, time + 0.09);
+    noise.connect(bp); bp.connect(g); g.connect(master);
+    tone.connect(tg); tg.connect(master);
+    noise.start(time); noise.stop(time + 0.22);
+    tone.start(time); tone.stop(time + 0.12);
+  }
+
+  function hat(time, open=false) {
+    const bufSize = audioCtx.sampleRate * (open ? 0.09 : 0.04);
+    const buf = audioCtx.createBuffer(1, bufSize, audioCtx.sampleRate);
+    const d = buf.getChannelData(0);
+    for (let i = 0; i < bufSize; i++) d[i] = Math.random()*2 - 1;
+    const noise = audioCtx.createBufferSource();
+    noise.buffer = buf;
+    const hp = audioCtx.createBiquadFilter();
+    hp.type = 'highpass'; hp.frequency.value = 7200;
+    const g = audioCtx.createGain();
+    g.gain.setValueAtTime(open ? 0.06 : 0.07, time);
+    g.gain.exponentialRampToValueAtTime(0.001, time + (open ? 0.09 : 0.035));
+    noise.connect(hp); hp.connect(g); g.connect(master);
+    noise.start(time); noise.stop(time + 0.12);
+  }
+
+  function playStep(s, time) {
+    distortedGuitar(time, f(lead[s]), stepDur * 0.95, 0.07);
+    mutedChug(time, f(rhythm[s]), stepDur, 0.14);
+    bassNote(time, f(bass[s]), stepDur * 0.95, 0.18);
+
+    // Rock drum kit — 8-step pattern repeating 4x across the melody loop
+    const beat = s % 8;
+    if (beat === 0 || beat === 4) kick(time);
+    if (beat === 2 || beat === 6) snare(time);
+    hat(time, beat === 7);  // slight open hat on the "and" of 4 for groove
+  }
+
+  function scheduler() {
+    if (!musicOn) return;
+    while (nextNoteTime < audioCtx.currentTime + 0.25) {
+      playStep(step, nextNoteTime);
+      nextNoteTime += stepDur;
+      step = (step + 1) % lead.length;
+    }
+    schedulerId = setTimeout(scheduler, 25);
+  }
+
+  const btn = document.getElementById('music-toggle');
+  const label = btn.querySelector('.label');
+  const ico = btn.querySelector('.ico');
+
+  btn.addEventListener('click', () => {
+    if (!audioCtx) {
+      audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      master = audioCtx.createGain();
+      master.gain.value = 0.85;
+      master.connect(audioCtx.destination);
+    }
+    if (audioCtx.state === 'suspended') audioCtx.resume();
+
+    if (musicOn) {
+      musicOn = false;
+      clearTimeout(schedulerId);
+      btn.classList.remove('playing');
+      ico.textContent = '🎸';
+      label.innerHTML = 'Enter the Jungle';
+    } else {
+      musicOn = true;
+      step = 0;
+      nextNoteTime = audioCtx.currentTime + 0.08;
+      scheduler();
+      btn.classList.add('playing');
+      ico.textContent = '🤘';
+      label.innerHTML = '<span class="bars"><span></span><span></span><span></span><span></span></span>&nbsp; Kill the Riff';
+    }
+  });
+})();
+</script>
+
+</body>
+</html>
